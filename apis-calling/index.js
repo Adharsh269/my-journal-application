@@ -60,7 +60,7 @@ app.get("/users/:id/episodes/:episode_id", async (req, res) => {
     const userid = req.params.id;
     const episodeId = req.params.episode_id;
     const result = await db.query(
-      "SELECT u.id, u.username, e.id, e.star, e.mood, e.episode_date, JSON_BUILD_OBJECT('wentwell',JSON_AGG(DISTINCT w.list), 'wentwrong', JSON_AGG(DISTINCT wr.list), 'learnings', JSON_AGG(DISTINCT l.list)) as episode FROM episode AS e JOIN users as u ON e.user_id = u.id JOIN wentwell AS w ON e.id = w.episode_id JOIN wentwrong AS wr ON e.id = wr.episode_id JOIN learning AS l ON e.id = l.episode_id where u.id = $1 and e.id = $2 GROUP BY u.id, e.id, e.star, e.mood, e.episode_date",
+      `SELECT u.id, u.username, e.id, e.star, e.mood, e.episode_date, JSON_BUILD_OBJECT('wentwell',JSON_AGG(DISTINCT w.list), 'wentwrong', JSON_AGG(DISTINCT wr.list), 'learnings', JSON_AGG(DISTINCT l.list)) as episode FROM episode AS e JOIN users as u ON e.user_id = u.id JOIN wentwell AS w ON e.id = w.episode_id JOIN wentwrong AS wr ON e.id = wr.episode_id JOIN learning AS l ON e.id = l.episode_id where u.id = $1 and e.id = $2 GROUP BY u.id, e.id, e.star, e.mood, e.episode_date`,
       [userid, episodeId]
     );
     res.json(result.rows);
@@ -121,7 +121,11 @@ app.get("/users/:id/prompts", async (req, res) => {
   try {
     const userid = req.params.id;
     const result = await db.query(
-      "SELECT u.id, u.username, JSON_AGG(DISTINCT p.list) as prompts FROM users AS u JOIN prompts AS p ON u.id = p.user_id WHERE u.id = $1 GROUP BY u.id, u.username;",
+      `SELECT u.id, u.username, 
+      JSON_AGG(DISTINCT p.list) as prompts 
+      FROM users AS u JOIN prompts AS p ON u.id = p.user_id 
+      WHERE u.id = $1 
+      GROUP BY u.id, u.username;`,
       [userid]
     );
     res.json(result.rows);
@@ -134,9 +138,15 @@ app.get("/users/:id/goals", async (req, res) => {
   try {
     const userid = req.params.id;
     const result = await db.query(
-      "SELECT u.id, u.username,  JSON_AGG(DISTINCT lg.list) as lifegoals FROM users as u JOIN lifegoals as lg ON lg.user_id = u.id WHERE u.id = $1 GROUP BY u.id, u.username",
+      `SELECT u.id, u.username,  
+      JSON_AGG(DISTINCT lg.list) as lifegoals 
+      FROM users as u 
+      JOIN lifegoals as lg ON lg.user_id = u.id 
+      WHERE u.id = $1 
+      GROUP BY u.id, u.username`,
       [userid]
     );
+    console.log(result.rows);
     res.json(result.rows);
   } catch (err) {
     res.json(err);
@@ -160,7 +170,6 @@ FROM users AS u
 JOIN(
 	SELECT t.id AS thought_id, t.user_id, t.star, t.date, t.feelings
 	FROM thoughts AS t
-	--GROUP BY t.id, t.user_id, t.star, t.date, t.feelings
 ) AS t ON t.user_id = u.id
 WHERE u.id = $1
 GROUP BY u.id, u.username;`,
@@ -230,7 +239,17 @@ app.get("/users/:id/todo", async (req, res) => {
   try {
     const userid = req.params.id;
     const result = await db.query(
-      "SELECT u.id, u.username, JSON_BUILD_OBJECT( 	'todo_item',td.todo_item, 	'start',td.todo_start, 	'end',td.todo_end ) as item FROM users as u JOIN todo as td ON td.user_id = u.id WHERE u.id = $1 GROUP BY u.id, u.username, td.todo_item, td.todo_start, td.todo_end;",
+      `SELECT u.id, u.username, JSON_AGG(
+	JSON_BUILD_OBJECT( 
+	'id', td.id,
+	'todo_item',td.todo_item, 	
+	'start',td.todo_start, 	
+	'end',td.todo_end ) --
+)AS items 
+FROM users as u 
+JOIN todo as td ON td.user_id = u.id
+WHERE u.id = $1
+GROUP BY u.id, u.username;`,
       [userid]
     );
     res.json(result.rows);
