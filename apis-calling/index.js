@@ -312,11 +312,14 @@ app.delete("/users/:id/episodes/:episode_id", async (req, res) => {
   try {
     const userid = req.params.id;
     const episodeid = req.params.episode_id;
-    await db.query(`DELETE FROM episode WHERE episode.id = $1 AND episode.user_id = $2`, [episodeid, userid])
-    res.json({message:"Successfully deleted the data."});
+    const result = await db.query(`DELETE FROM episode WHERE episode.id = $1 AND episode.user_id = $2 RETURNING *`, [episodeid, userid])
+    if(result.rowCount === 0) {
+      return res.status(404).json({message:"Episode does not found or does not belong to the user."})
+    }
+    res.status(200).json({message:"Successfully deleted episode.", episodeid});
   } catch (err) {
     console.log(err);
-    res.json(err);
+    res.status(500).json(err);
   }
 });
 
@@ -343,11 +346,15 @@ app.delete("/users/:id/thoughts/:thoughts_id", async (req, res) => {
   try {
     const userid = req.params.id;
     const thoughtid = req.params.thoughts_id;
-    await db.query(`DELETE FROM thoughts WHERE thoughts.id = $1 AND thoughts.user_id = $2`, [thoughtid, userid]);
-    res.json({message:"successfully delete thought with the id", thoughtid});
+    const result = await db.query(`DELETE FROM thoughts WHERE thoughts.id = $1 AND thoughts.user_id = $2 RETURNING *`, [thoughtid, userid]);
+
+    if(result.rowCount === 0) {
+      return res.status(404).json({message:"Thought does not found or does not belong to the user."})
+    }
+    res.status(200).json({message:"Successfully deleted thought.", thoughtid});
   } catch (err) {
     console.log(err);
-    res.json(err);
+    res.status(500).json(err);
   }
 });
 
