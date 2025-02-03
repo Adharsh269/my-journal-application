@@ -7,6 +7,7 @@ const app = express();
 const port = process.env.PORT;
 
 app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 
 const db = new pg.Client({
   user: process.env.PG_USER,
@@ -254,6 +255,98 @@ GROUP BY u.id, u.username;`,
     );
     res.json(result.rows);
   } catch (err) {
+    res.json(err);
+  }
+});
+
+app.post("/users/:id/episodes", async(req, res) => {
+  try {
+    const userid = req.params.id;
+    const {star, mood} = req.body;
+
+    const wentwell = Array.isArray(req.body.wentwell) ? req.body.wentwell : [];
+    const wentwrong = Array.isArray(req.body.wentwrong) ? req.body.wentwrong : [];
+    const learning = Array.isArray(req.body.learning) ? req.body.learning : [];
+
+    await db.query("BEGIN");
+    const result = await db.query(`
+        INSERT INTO episode(star, mood, user_id, episode_date)
+        VALUES ($1, $2, $3, NOW())
+        RETURNING id ;
+      `, [star, mood, userid]);
+
+      const episode_id = result.rows[0].id;
+      
+      const insertList = async (table, lists) => {
+        if(lists.length > 0) {
+          const values = lists.map((_, i) => `($${i + 1}, $${lists.length + 1})`).join(",");
+          await db.query(`INSERT INTO ${table}(list, episode_id) VALUES ${values}`, [...lists, episode_id]);
+        }
+      };
+      await insertList("wentwell", wentwell);
+      await insertList("wentwrong", wentwrong);
+      await insertList("learning", learning);
+      // const wentwellValue = wentwell.map((item) => `('${item}', ${episode_id})`).join(",");
+      // if(wentwellValue) {
+      //   await db.query(`INSERT INTO wentwell(list, episode_id) VALUES ${wentwellValue} RETURNING id;`)
+      // }
+      // const wentwrongValue = wentwrong.map((item) => `('${item}', ${episode_id})`).join(",");
+      // if(wentwrongValue) {
+      //   await db.query(`INSERT INTO wentwrong(list, episode_id) VALUES ${wentwrongValue} RETURNING id;`)
+      // }
+      // const learninglValue = learning.map((item) => `('${item}', ${episode_id})`).join(",");
+      // if(learninglValue) {
+      //   await db.query(`INSERT INTO learning(list, episode_id) VALUES ${learninglValue} RETURNING id;`)
+      // }
+      await db.query("COMMIT");
+      res.json({messgae:"Successfully inserted the episode in the database.",episode_id})
+  } catch (err) {
+    await db.query("ROLLBACK");
+    console.log(err);
+    res.json(err);
+  }
+});
+
+/** to delete individual episode from the database */
+app.delete("/users/:id/episodes/:episode_id", async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const episodeid = req.params.episode_id;
+    await db.query(`DELETE FROM episode WHERE episode.id = $1 AND episode.user_id = $2`, [episodeid, userid])
+    res.json({message:"Successfully deleted the data."});
+  } catch (err) {
+    console.log(err);
+    res.json(err);
+  }
+});
+
+/** posting the feelings to the mind */
+app.post("/users/:id/thoughts", async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const {feelings, star} = req.body;
+    await db.query("BEGIN");
+    await db.query(`INSERT INTO thoughts(feelings, user_id, star, date)
+        VALUES ($1, $2, $3, NOW());
+      `, [feelings, userid, star]);
+    await db.query("COMMIT");
+    res.json({message:"successfully inserted data to thoughts table"});
+  } catch(err) {
+    await db.query("ROLLBACK");
+    console.log(err);
+    res.json(err);
+  }
+});
+
+/** delteing thoughts from the thoughts table */
+app.delete("/users/:id/thoughts/:thoughts_id", async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const thoughtid = req.params.thoughts_id;
+    await db.query(`DELETE FROM thoughts WHERE thoughts.id = $1 AND thoughts.user_id = $2`, [thoughtid, userid]);
+    res.json({message:"successfully delete thought with the id", thoughtid});
+  } catch (err) {
+    console.log(err);
     res.json(err);
   }
 });
