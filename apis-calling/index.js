@@ -299,7 +299,7 @@ app.post("/users/:id/episodes", async(req, res) => {
       //   await db.query(`INSERT INTO learning(list, episode_id) VALUES ${learninglValue} RETURNING id;`)
       // }
       await db.query("COMMIT");
-      res.json({messgae:"Successfully inserted the episode in the database.",episode_id})
+      res.send(201).json({messgae:"Successfully inserted the episode in the database.",episode_id})
   } catch (err) {
     await db.query("ROLLBACK");
     console.log(err);
@@ -333,7 +333,7 @@ app.post("/users/:id/thoughts", async (req, res) => {
         VALUES ($1, $2, $3, NOW());
       `, [feelings, userid, star]);
     await db.query("COMMIT");
-    res.json({message:"successfully inserted data to thoughts table"});
+    res.status(201).json({message:"successfully inserted data to thoughts table"});
   } catch(err) {
     await db.query("ROLLBACK");
     console.log(err);
@@ -366,7 +366,7 @@ app.post("/users/:id/prompts", async (req, res) => {
     await db.query(`INSERT INTO prompts(list, user_id)
       VALUES ($1, $2);`, [prompt, userid]);
     await db.query("COMMIT");
-    res.json({message:"successfully inserted prompt", userid});
+    res.status(201).json({message:"successfully inserted prompt", userid});
   } catch (err) {
     await db.query("ROLLBACK");
     console.log(err);
@@ -402,7 +402,7 @@ app.post("/users/:id/lifegoals", async (req, res) => {
     await db.query(`INSERT INTO lifegoals(list, user_id)
       VALUES ($1, $2)`, [goal, userid]);
     await db.query("COMMIT");
-    res.status(200).json({message:"goal is updated to the database."})
+    res.status(201).json({message:"goal is updated to the database."})
   } catch(err) {
     await db.query("ROLLBACK");
     console.log(err);
@@ -435,7 +435,7 @@ app.post("/users/:id/todo", async (req, res) => {
     await db.query(queryText, queryParamas);
     
     await db.query("COMMIT");
-    res.status(200).json({message:"Todo item is added."});
+    res.status(201).json({message:"Todo item is added."});
   } catch (err) {
     await db.query("ROLLBACK");
     console.log(err);
@@ -455,6 +455,53 @@ app.delete("/users/:id/todo/:todo_id", async (req, res) => {
     }
     
     res.status(200).json({message:"Todo item is successfully done and deleted."})
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+/** patching the database the episode*/
+app.patch("/users/:id/episode/:episode_id", async (req, res) => {
+  try {
+    const {id, episode_id} = req.params;
+  } catch (err) {
+    await db.query("ROLLBACK");
+    res.status(500).json({message:"Did not updated."})
+  }
+});
+
+/** updating lifegoals */
+app.patch("/users/:id/goals/:goals_id", async (req, res) => {
+  try {
+    const { id , goals_id} = req.params;
+    const goal = req.body.goal;
+
+    const result = await db.query(`UPDATE lifegoals SET list = $1 WHERE lifegoals.id = $2 AND lifegoals.user_id = $3`, [goal, goals_id, id]);
+
+    if(result.rowCount === 0) {
+      return res.status(404).json({message:"life goal is not updated."});
+    }
+    res.status(200).json({message:"Successfully updated the goal."});
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+/** updating todo item */
+app.patch("/users/:id/todo/:todo_id", async (req, res) => {
+  try {
+    const {id, todo_id} = req.params;
+    const updates = req.body;
+    const setClauses = Object.keys(updates).map((key, index) => `${key} = $${index + 2}`).join(",");
+    const values = [todo_id, ...Object.values(updates)];
+    const result = await db.query(`UPDATE todo SET ${setClauses} WHERE todo.id = $1 RETURNING *;`, values);
+
+    if(result.rowCount === 0) {
+      return res.status(404).json({message:"Todo not found"});
+    }
+    res.status(200).json({message:"Todo is updated."});
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
