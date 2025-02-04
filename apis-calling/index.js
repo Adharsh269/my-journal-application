@@ -358,6 +358,109 @@ app.delete("/users/:id/thoughts/:thoughts_id", async (req, res) => {
   }
 });
 
+/** to post a prompt to individual user */
+app.post("/users/:id/prompts", async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const prompt  = req.body.prompt;
+    await db.query(`INSERT INTO prompts(list, user_id)
+      VALUES ($1, $2);`, [prompt, userid]);
+    await db.query("COMMIT");
+    res.json({message:"successfully inserted prompt", userid});
+  } catch (err) {
+    await db.query("ROLLBACK");
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+/**deleting the prompt from the database of specific user */
+app.delete("/users/:id/prompts/:prompt_id", async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const promptid = req.params.prompt_id;
+    const result = await db.query(`DELETE FROM prompts
+      WHERE prompts.id = $1 AND prompts.user_id = $2`, [promptid, userid]);
+
+      if(result.rowCount === 0) {
+        return res.status(404).json({message:"Prompt not found or it does not belongto the user."})
+      }
+      res.status(200).json({message:"Prompt is successfully deleted."})
+  } catch(err) {
+    console.log(err);
+    res.status(500).json(err);
+  } 
+});
+
+/** posting lifegoals to the database */
+app.post("/users/:id/lifegoals", async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const goal = req.body.goal;
+    console.log(goal);    
+    await db.query("BEGIN");
+    await db.query(`INSERT INTO lifegoals(list, user_id)
+      VALUES ($1, $2)`, [goal, userid]);
+    await db.query("COMMIT");
+    res.status(200).json({message:"goal is updated to the database."})
+  } catch(err) {
+    await db.query("ROLLBACK");
+    console.log(err);
+    res.status(500).json({err});
+  }
+});
+
+/** we do not delete the life goals, we just mark it as lined*/
+/** posting the daily todo to the database. */
+app.post("/users/:id/todo", async (req, res) => {
+  try {
+    const userid = req.params.id;
+    let todo = req.body.todo;
+    const start = req.body.start;
+    const end = req.body.end;
+
+    if (!Array.isArray(todo)) {
+      todo = todo ? [todo] : [];
+    }
+
+    if (!todo.length) {
+      return res.status(400).json({ message: "Todo list cannot be empty." });
+    }
+    await db.query("BEGIN");
+    const values = todo.map((item, index) => `($${index * 4 + 1}, $${index * 4 + 2}, $${index * 4 + 3}, $${index * 4 + 4})`).join(",");
+    const queryParamas = todo.flatMap((item) => [item, userid, start, end]);
+
+    const queryText = `INSERT INTO todo (todo_item, user_id, todo_start, todo_end) VALUES ${values}`;
+
+    await db.query(queryText, queryParamas);
+    
+    await db.query("COMMIT");
+    res.status(200).json({message:"Todo item is added."});
+  } catch (err) {
+    await db.query("ROLLBACK");
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+/**deleting the completed task */
+app.delete("/users/:id/todo/:todo_id", async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const todoid = req.params.todo_id;
+    console.log(userid," ",todoid);
+    const result = await db.query(`DELETE FROM todo WHERE todo.id = $1 AND todo.user_id = $2 `, [todoid, userid]); 
+    if(result.rowCount === 0) {
+      return res.status(400).json({message:"Todo does not there or it is does not belong to the user."})
+    }
+    
+    res.status(200).json({message:"Todo item is successfully done and deleted."})
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
 app.listen(port, () => {
   console.log("Server running on:", port);
 });
