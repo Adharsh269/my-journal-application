@@ -462,12 +462,27 @@ app.delete("/users/:id/todo/:todo_id", async (req, res) => {
 });
 
 /** patching the database the episode*/
-app.patch("/users/:id/episode/:episode_id", async (req, res) => {
+app.patch("/users/:id/episodes/:episodes_id", async (req, res) => {
   try {
-    const {id, episode_id} = req.params;
+    const {episodes_id} = req.params;
+    const wentwell = req.body.wentwell;
+    const wentwrong = req.body.wentwrong;
+    const learning = req.body.learning;
+    
+    await db.query("BEGIN");
+    const updateEpisode = async (table, lists) => {
+      await db.query(`UPDATE ${table} SET list = $1 WHERE ${table}.episode_id = $2`,[lists, episodes_id]);
+    }
+    if(wentwell) await updateEpisode("wentwell", wentwell);
+    if(wentwrong) await updateEpisode("wentwrong", wentwrong);
+    if(learning) await updateEpisode("learning", learning);
+
+    await db.query("COMMIT");
+    res.status(200).json({message:"Successfully updated the episode."});
   } catch (err) {
     await db.query("ROLLBACK");
-    res.status(500).json({message:"Did not updated."})
+    console.log(err);
+    res.status(500).json({message:"Did not updated."});
   }
 });
 
