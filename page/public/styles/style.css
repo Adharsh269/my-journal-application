@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Ranga:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Ranga:wght@400;700&display=swap');
 body {
 	padding: 0;
 	margin: 0;
@@ -33,4 +33,23 @@ h1 > a {
 	height: 300px;
 	margin:30px;
 	background-color: #ffffff;
+}
+
+label {
+	height: 80px;
+	font-family: "Montserrat", serif;
+	font-size: 30px;
+	font-weight: bold;
+}
+
+hr{
+	color: #000;
+	background-color: #000;
+	height: 3px;
+	border: none;
+}
+p {
+	font-family: "Montserrat", serif;
+	font-weight: normal;
+	font-size: 20px;
 }

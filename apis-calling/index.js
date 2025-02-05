@@ -18,6 +18,35 @@ const db = new pg.Client({
 });
 db.connect();
 
+app.post("/users", async (req, res) => {
+  try {
+    const { username, email, password, confirmpassword } = req.body;
+    await db.query("BEGIN");
+    await db.query(`INSERT INTO users(username, email, password, confirmpassword)
+      VALUES ($1, $2, $3, $4)`,[username, email, password, confirmpassword]);
+    await db.query("COMMIT");
+    res.status(200).json({message:"Successfully Inserted new user."});
+  } catch (err) {
+    await db.query("ROLLBACK");
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+app.get("/users", async (req, res) => {
+  try {
+    const { email } = req.query;
+    const result = await db.query(`SELECT * FROM users WHERE email = $1`, [email])
+    if(!result){
+      return ;
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
 app.get("/users/:id/episodes", async (req, res) => {
   try {
     const userid = req.params.id;
@@ -50,7 +79,7 @@ app.get("/users/:id/episodes", async (req, res) => {
             GROUP BY u.id, u.username `,
       [userid]
     );
-    res.json(result.rows);
+    res.json(result);
   } catch (err) {
     res.send(err);
   }

@@ -1,12 +1,48 @@
 <%- include('partials/header.ejs') %>
 <main>
 	<div class="container-fluid d-flex justify-content-around flex-wrap mt-5">
-		<div class="episode box  rounded"></div>
-		<div class="thoughts box  rounded"></div>
-		<div class="rated box  rounded"></div>
-		<div class="prompts box  rounded"></div>
-		<div class="lifegoals box  rounded"></div>
-		<div class="todo box  rounded"></div>
+		<div class="episode box  rounded">
+			<form action="/episodes" method="get" onclick="this.submit()" class="h-100">
+				<label for="episode" class="p-3 w-100">Write The episode</label>
+				<hr class="border-5 border-dark opacity-100 m-0">
+				<p class="p-3">Post your daily events, your good happening, what you did wrong, what you learnt from them.</p>
+			</form>
+		</div>
+		<div class="thoughts box  rounded">
+			<form action="thoughts" method="get" onclick="this.submit()" class="h-100">
+				<label for="thought" class="p-3 w-100">What is on your Mind ?</label>
+				<hr class="border-5 border-dark opacity-100 m-0">
+				<p class="p-3">At any movement in your life, if any feeling arise in your mind. They can be any emotion. Share it here, you can check it out when ever you want.</p>
+			</form>
+		</div>
+		<div class="rated box  rounded">
+			<form action="/star" method="get" onclick="this.submit()" class="h-100">
+				<label for="rated" class="p-3 w-100">Stared</label>
+				<hr class="border-5 border-dark opacity-100 m-0">
+				<p class="p-3">Important posts from Episodes and What is On your Mind ? can be found here. You are stared them while posting them. </p>
+			</form>
+		</div>
+		<div class="prompts box  rounded">
+			<form action="/prompts" method="get" onclick="this.submit()" class="h-100">
+				<label for="prompts" class="p-3 w-100">Prompts</label>
+				<hr class="border-5 border-dark opacity-100 m-0">
+				<p class="p-3">Prompts are the one, you can yourself to lead the life. Being quistoned to you to lead a intgrity life and never cross the line of values you follow.</p>
+			</form>
+		</div>
+		<div class="lifegoals box  rounded">
+			<form action="/lifegoals" method="get" onclick="this.submit()" class="h-100">
+				<label for="lifegoals" class="p-3 w-100">Life Goals</label>
+				<hr class="border-5 border-dark opacity-100 m-0">
+				<p class="p-3">Your Life Goals, remind you, what to live for. These are the things gives directions to lead the life and achieve them no matter what.</p>
+			</form>
+		</div>
+		<div class="todo box  rounded">
+			<form action="/todo" method="get" onclick="this.submit()" class="h-100">
+				<label for="todo" class="p-3 w-100">Todo List</label>
+				<hr class="border-5 border-dark opacity-100 m-0">
+				<p class="p-3">Yourr daily todo list. Completing them at the right time can save you a whole amout of time to do other tasks. Do them, be stress free.</p>
+			</form>
+		</div>
 	</div>
 </main>
 <%- include('partials/footer.ejs') %>
