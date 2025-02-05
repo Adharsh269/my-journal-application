@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Ranga:wght@400;700&display=swap');
+body {
+	padding: 0;
+	margin: 0;
+  background-color: #d9d9d9;
+}
+
+.nav {
+	background-color: #343434;
+	height: 100px;
+	align-content: center;
+}
+
+.nav-img {
+	width: 60px;
+}
+
+.start, .end {
+	display: flex;
+	gap: 7px;
+	align-items: center;
+}
+
+h1 > a {
+	text-decoration: none;
+	font-family: "Ranga", serif;
+	color: #d9d9d9;
+	font-size: 80px;
+}
+
+.box {
+	width: 450px;
+	height: 300px;
+	margin:30px;
+	background-color: #ffffff;
+}
