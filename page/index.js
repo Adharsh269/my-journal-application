@@ -89,31 +89,23 @@ app.post("/register", async (req, res) => {
 });
 
 passport.use("local",
-	new Strategy(async function verify(email, password, cb) {
+	new Strategy({usernameField: "email" }, async function verify(email, password, cb) {
 		try {
-			const result = await axios.get(`http:localhost:3000/users?email=${encodeURIComponent(email)}`);
-			console.log(result.data);
-			if(result.data){
-				const user = result.data;
-				const storedHashedPassword = user.password;
-				bcrypt.compare(password, storedHashedPassword, (err, valid) => {
-					if(err) {
-						console.log("Error comparing password:",err);
-						return cb(err);
-					} else {
-						if(valid) {
-							return cb(null, user);
-						} else {
-							return cb(null, false);
-						}
-					}
-				});
-			} else {
-				alert("not found");
+			const result = await axios.get(`http://localhost:3000/users?email=${encodeURIComponent(email)}`);
+			console.log(result.data.rows);
+			if(!result.data.rows){
+				return cb(null, false, {message:"user not found"});
 			}
+			const user = result.data.rows[0];
+			const storedHashedPassword = user.password;
+			const isValid = bcrypt.compare(password, storedHashedPassword);
+			if (!isValid) {
+				return cb(null, false, {message:"Incorrect password"});
+			}
+			return cb(null, user);
 		} catch (error) {
 			console.log(error);
-			res.status(500).json(error);
+			return cb(error);
 		}
 	})
 );
