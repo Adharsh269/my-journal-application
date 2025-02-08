@@ -22,8 +22,8 @@ app.post("/users", async (req, res) => {
   try {
     const { username, email, password, confirmpassword } = req.body;
     await db.query("BEGIN");
-    await db.query(`INSERT INTO users(username, email, password, confirmpassword)
-      VALUES ($1, $2, $3, $4)`,[username, email, password, confirmpassword]);
+    await db.query(`INSERT INTO users(username, email, password)
+      VALUES ($1, $2, $3)`,[username, email, password]);
     await db.query("COMMIT");
     res.status(200).json({message:"Successfully Inserted new user."});
   } catch (err) {

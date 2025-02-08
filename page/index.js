@@ -56,7 +56,7 @@ app.get("/logout", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-	const { username, email, password, confirmpassword} = req.body;
+	const { username, email, password } = req.body;
 	try {
 		const checkResult = await axios.get(`http://localhost:3000/users?email=${encodeURIComponent(email)}`);
 		const userExists = Array.isArray(checkResult.data.rows) ? checkResult.data.rows.length > 0 : false;
@@ -71,7 +71,6 @@ app.post("/register", async (req, res) => {
 				username,
 				email,
 				password:hashedPassword,
-				confirmpassword:hashedPassword
 		});
 		const user = result.data;
 		req.login(user, (err) => {
