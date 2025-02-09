@@ -9,7 +9,8 @@ import session from "express-session";
 const app = express();
 env.config();
 const port = process.env.PORT;
-const saltRounds = 10;
+const saltRounds = process.env.SALTROUNDS;
+
 app.use(
 	session({
 		secret:process.env.SESSION_SECRET,
@@ -20,15 +21,18 @@ app.use(
 		}
 	})
 );
+app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(express.static("public"));
 app.use(passport.initialize());
 app.use(passport.session());
 
+
 app.get("/", (req, res) => {
 	req.isAuthenticated() ? res.redirect("/home") : res.redirect("/login");
 })
 app.get("/home", (req, res) => {
+	// console.log(req.body);
 	req.isAuthenticated() ? res.render("index.ejs") : res.redirect("/login");
 });
 
@@ -46,7 +50,7 @@ app.post("/login",
 	})
 );
 
-app.get("/logout", (req, res) => {
+app.get("/logout", (req, res, next) => {
 	req.logout(function (err) {
 		if(err) {
 			return next(err);
@@ -91,7 +95,7 @@ passport.use("local",
 	new Strategy({usernameField: "email" }, async function verify(email, password, cb) {
 		try {
 			const result = await axios.get(`http://localhost:3000/users?email=${encodeURIComponent(email)}`);
-			console.log(result.data.rows);
+			// console.log(result.data.rows);
 			if(!result.data.rows){
 				return cb(null, false, {message:"user not found"});
 			}
@@ -110,16 +114,44 @@ passport.use("local",
 );
 
 app.get("/episodes", async (req, res) => {
-	try {
-		const userid = 1;
-		const result = await axios.get(`http://localhost:3000/users/${userid}/episodes`);
-		res.send(JSON.stringify(result.data.rows));
-	} catch (error) {
-		console.log(error);
-		res.status(500).json(error);
+	if(req.isAuthenticated()) {
+		try {
+			const userid = req.user.id;
+			console.log(req.user.id);
+			const result = await axios.get(`http://localhost:3000/users/${userid}/episodes`);
+			const episodes = result.data.rows?.[0].posts;
+			res.render("episodes.ejs",{episodes: episodes});
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
 	}
 });
 
+app.get("/episode/:id", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const { id } = req.params;
+		const userid = req.user.id;
+		console.log(userid," ",id);
+		try {
+			const result = await axios.get(`http://localhost:3000/users/${userid}/episodes/${id}`);
+			const episode = result.data[0];
+			if(!result.data) {
+				return res.status(404).send("Episode not found");
+			}
+			res.render("episode.ejs", 
+				{episode : episode}
+			)
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
 
 passport.serializeUser((user, cb) => {
 	cb(null, user);

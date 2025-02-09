@@ -27,6 +27,9 @@ h1 > a {
 	color: #d9d9d9;
 	font-size: 80px;
 }
+h1, p{
+	font-family: "Montserrat", serif;
+}
 
 .box {
 	width: 450px;
@@ -49,7 +52,18 @@ hr{
 	border: none;
 }
 p {
-	font-family: "Montserrat", serif;
 	font-weight: normal;
 	font-size: 20px;
+}
+
+.no-episode {
+	width: 100%;
+	height: 500px;
+	/* background-color: #ffffff; */
+}
+
+.episode-post {
+	width: 300px;
+	height: 300px;
+	background-color: #ffffff;
 }

@@ -1,0 +1,26 @@
+<%- include('partials/header.ejs') %>
+<div class="container">
+    <% if(locals.episode) { %>
+        <%= episode.posts[0].star ? '⭐' : '☆' %>
+        <%= episode.posts[0].mood %>
+        <%= episode.posts[0].episode_date %>
+        <div class="wentwell ">
+            <% episode.posts[0].wentwell.forEach((ww) => { %>
+                <li><%= ww %></li>
+            <% }); %>
+        </div>
+        <div class="wentwrong">
+            <% episode.posts[0].wentwrong.forEach((wr) => { %>
+                <%= wr ? `<li>${wr}</li>` : "" %>
+            <% }); %>
+        </div>
+        <div class="learning">
+            <% episode.posts[0].learning.forEach((l) => { %>
+                <%= l ? `<li>${l}</li>` : "" %>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <h1>No episode</h1>
+    <% } %>
+</div>
+<%- include('partials/footer.ejs') %>

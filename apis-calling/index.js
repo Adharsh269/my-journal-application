@@ -19,13 +19,13 @@ const db = new pg.Client({
 db.connect();
 
 app.post("/users", async (req, res) => {
+  const { username, email, password } = req.body;
   try {
-    const { username, email, password, confirmpassword } = req.body;
     await db.query("BEGIN");
     await db.query(`INSERT INTO users(username, email, password)
       VALUES ($1, $2, $3)`,[username, email, password]);
     await db.query("COMMIT");
-    res.status(200).json({message:"Successfully Inserted new user."});
+    res.status(201).json({message:"Successfully Inserted new user."});
   } catch (err) {
     await db.query("ROLLBACK");
     console.log(err);
@@ -54,8 +54,8 @@ app.get("/users/:id/episodes", async (req, res) => {
       `SELECT  u.id,u.username,
             COALESCE(JSON_AGG(
                     JSON_BUILD_OBJECT(
-                        'episode id', e.episode_id,
-                        'episode date', e.episode_date,
+                        'episode_id', e.episode_id,
+                        'episode_date', e.episode_date,
                         'star', e.star,
                         'mood', e.mood,
                         'wentwell', e.wentwell,
@@ -90,7 +90,35 @@ app.get("/users/:id/episodes/:episode_id", async (req, res) => {
     const userid = req.params.id;
     const episodeId = req.params.episode_id;
     const result = await db.query(
-      `SELECT u.id, u.username, e.id, e.star, e.mood, e.episode_date, JSON_BUILD_OBJECT('wentwell',JSON_AGG(DISTINCT w.list), 'wentwrong', JSON_AGG(DISTINCT wr.list), 'learnings', JSON_AGG(DISTINCT l.list)) as episode FROM episode AS e JOIN users as u ON e.user_id = u.id JOIN wentwell AS w ON e.id = w.episode_id JOIN wentwrong AS wr ON e.id = wr.episode_id JOIN learning AS l ON e.id = l.episode_id where u.id = $1 and e.id = $2 GROUP BY u.id, e.id, e.star, e.mood, e.episode_date`,
+      `SELECT 
+	u.id, 
+	u.username, 
+	COALESCE(JSON_AGG(
+		JSON_BUILD_OBJECT(
+			'episode_id', e.episode_id,
+			'episode_date', e.episode_date,
+			'star', e.star,
+			'mood', e.mood,
+			'wentwell', e.wentwell,
+			'wentwrong', e.wentwrong,
+			'learning', e.learning
+		)
+	) FILTER (WHERE e.episode_id IS NOT NULL), '[]' :: json) AS posts
+FROM users as u
+LEFT JOIN (
+	SELECT e.id AS episode_id, e.user_id, e.star, e.mood, e.episode_date,
+	JSON_AGG(DISTINCT ww.list) AS wentwell,
+	JSON_AGG(DISTINCT wr.list) AS wentwrong,
+	JSON_AGG(DISTINCT l.list) AS learning
+	FROM episode AS e
+	LEFT JOIN wentwell AS ww ON ww.episode_id = e.id 
+	LEFT JOIN wentwrong AS wr ON wr.episode_id = e.id 
+	LEFT JOIN learning AS l ON l.episode_id = e.id 
+	WHERE e.id = $2
+	GROUP BY e.id, e.user_id, e.star, e.mood, e.episode_date
+) AS e ON e.user_id = u.id
+WHERE u.id = $1
+GROUP BY u.id, u.username`,
       [userid, episodeId]
     );
     res.json(result.rows);
@@ -328,11 +356,11 @@ app.post("/users/:id/episodes", async(req, res) => {
       //   await db.query(`INSERT INTO learning(list, episode_id) VALUES ${learninglValue} RETURNING id;`)
       // }
       await db.query("COMMIT");
-      res.send(201).json({messgae:"Successfully inserted the episode in the database.",episode_id})
+      res.status(201).json({messgae:"Successfully inserted the episode in the database.",episode_id})
   } catch (err) {
     await db.query("ROLLBACK");
     console.log(err);
-    res.json(err);
+    res.status(500).json(err);
   }
 });
 

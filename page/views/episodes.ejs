@@ -1,0 +1,29 @@
+<%- include('partials/header.ejs')  %>
+    <div class="container">
+			<div class="top-row mt-5 d-flex align-item-center justify-content-between gap-5">
+				<div></div>
+				<h1 class="heading">Episodes</h1>
+				<div class="addepisode">
+					<form action="/newepisode" method="get" onclick="this.submit()">	
+						<button class="btn btn-primary btn-lg">New Episode</button>
+					</form>
+				</div>
+			</div>
+			<div class="episodes d-inline-flex flex-wrap mt-5">
+				<% if(locals.episodes) { %>
+					<% episodes.forEach((episode) => { %>
+						<div class="episode-post  border p-3 m-2 rounded shadow">
+							<form action="/episode/<%= episode.episode_id %>" method="get" onclick="this.submit()" class="h-100">
+								<%= episode.episode_date %>
+								<%= episode.star ? '⭐' : '☆' %>
+							</form>
+						</div>
+					<% }); %>
+				<% } else { %>
+					<div class="no-episode mt-5 d-flex justify-content-center align-items-center">
+						<h1 style="color: #4A4A4A;">No Episodes Found</h1>
+					</div>
+				<% } %>
+			</div>
+		</div>
+<%- include('partials/footer.ejs') %>
