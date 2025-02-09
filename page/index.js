@@ -153,6 +153,14 @@ app.get("/episode/:id", async (req, res) => {
 	}
 });
 
+app.get("/account", (req, res) => {
+	if(req.isAuthenticated()) {
+		res.render("account.ejs", {user:req.user});
+	} else {
+		res.redirect("/login");
+	}
+});
+
 passport.serializeUser((user, cb) => {
 	cb(null, user);
 });

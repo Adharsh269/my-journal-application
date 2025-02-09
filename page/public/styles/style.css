@@ -2,7 +2,7 @@
 body {
 	padding: 0;
 	margin: 0;
-  background-color: #d9d9d9;
+	background-color: #d9d9d9;
 }
 
 .nav {
@@ -27,7 +27,8 @@ h1 > a {
 	color: #d9d9d9;
 	font-size: 80px;
 }
-h1, p{
+h1, h2, h3, p{
+	color: #37352F;
 	font-family: "Montserrat", serif;
 }
 
@@ -63,7 +64,16 @@ p {
 }
 
 .episode-post {
-	width: 300px;
-	height: 300px;
+	width: 200px;
+	height: 200px;
 	background-color: #ffffff;
+}
+
+[contenteditable] {
+	outline: 0px solid transparent;
+}
+
+li {
+	font-size: 25px;
+	color: #44423D;
 }

@@ -1,0 +1,22 @@
+<%- include('partials/header.ejs') %>
+    <div class="user container pt-5 mt-5">
+        <% if(locals.user) { %>
+            <h1 class="text-center">Account Overview</h1>
+            <div class="overview d-flex  flex-column align-items-center mt-5">
+                <div class="user-info d-flex flex-column border p-3 w-50">
+                    <div class="d-flex">
+                        <h4 class="fw-light w-50 text-start pe-3">Username</h4>
+                        <h4 class="fw-light text-end">: <%= user.username %></h4>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <h4 class="fw-light w-50 text-start pe-3">Email</h4 class="fw-light">
+                        <h4 class="fw-light text-end">: <%= user.email %></h4>
+                    </div>
+                </div>
+                <form action="/logout" method="get" onclick="this.submit()">
+                    <button class="btn btn-danger mt-5">Logout</button>
+                </form>
+            </div>
+        <% } %>
+    </div>
+<%- include('partials/footer.ejs') %>

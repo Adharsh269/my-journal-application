@@ -14,8 +14,10 @@
 					<% episodes.forEach((episode) => { %>
 						<div class="episode-post  border p-3 m-2 rounded shadow">
 							<form action="/episode/<%= episode.episode_id %>" method="get" onclick="this.submit()" class="h-100">
-								<%= episode.episode_date %>
-								<%= episode.star ? '⭐' : '☆' %>
+								<div class="open d-flex justify-content-between">
+									<p><%= episode.episode_date %></p>
+									<p><%= episode.star ? '⭐' : '☆' %></p>
+								</div>
 							</form>
 						</div>
 					<% }); %>
