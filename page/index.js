@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import session from "express-session";
+import e from "express";
 
 const app = express();
 env.config();
@@ -191,6 +192,42 @@ app.get("/thoughts/:id", async (req, res) => {
 				return res.status(404).send("Thought not found");
 			}
 			res.render("thoughtEpisode.ejs",{thought: thought})
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+			
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/prompts", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const userid = req.user.id;
+		try {
+			const result = await axios.get(`http://localhost:3000/users/${userid}/prompts`);
+			const prompts = result.data[0];
+			// console.log(prompts);
+			res.render("promptsGoals.ejs",{prompts: prompts});
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+			
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/lifegoals", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const userid = req.user.id;
+		try {
+			const result = await axios.get(`http://localhost:3000/users/${userid}/goals`);
+			const goals = result.data[0];
+			console.log(goals);
+			res.render("promptsGoals.ejs",{goals: goals});
 		} catch (error) {
 			console.log(error);
 			res.status(500).json(error);

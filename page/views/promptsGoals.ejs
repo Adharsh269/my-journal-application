@@ -1,0 +1,20 @@
+<%- include('partials/header.ejs') %>
+    <div class="container">
+        <div class="d-flex flex-column">
+            <div class="mt-5">
+                <h1>Prompts</h1>
+            </div>
+            <% if(locals.prompts) { %>
+                <% prompts.prompts.forEach((prompt) => { %>
+                    <h3 style="color: #44423D;" class="mt-2"><%- prompt ? `<li contentEditable="true" class="ps-4">${prompt}</li>` : "No prompts" %></h3>
+                <% }) %>
+            <% } else if( locals.goals) { %>
+                <% goals.lifegoals.forEach((lg) => { %>
+                    <h3 style="color: #44423D;" class="mt-2"><%- lg ? `<li contentEditable="true" class="ps-4">${lg}</li>` : "No prompts" %></h3>
+                <% }) %>
+            <% } else { %>
+                <h1>Nothing</h1>
+            <% } %>
+        </div>
+    </div>
+<%- include('partials/footer.ejs') %>
