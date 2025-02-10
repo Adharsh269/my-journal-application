@@ -1,0 +1,42 @@
+<%- include('partials/header.ejs') %>
+<div class="container">
+    <div class="top-row mt-5 d-flex align-item-center justify-content-between gap-5">
+        <div></div>
+        <h1 class="heading">What is on My Mind ?</h1>
+        <div class="addthought">
+            <form action="/newthought" method="get" onclick="this.submit()">	
+                <button class="btn btn-primary btn-lg">Thought</button>
+            </form>
+        </div>
+    </div>
+    <div class="thought d-inline-flex flex-wrap mt-5">
+        <% if(locals.thoughts) { %>
+            <% thoughts.posts.forEach((thought) => { %>
+                <div class="thought-post  border p-3 m-2 rounded shadow">
+                    <form action="/thoughts/<%= thought.id %>" method="get" onclick="this.submit()" class="h-100">
+                        <div class="open d-flex justify-content-between">
+                            <p><%= thought.date.slice(0,10) %></p>
+                            <p><%= thought.rated ? '⭐' : '☆' %></p>
+                        </div>
+                    </form>
+                </div>
+            <% }); %>
+        <% } else if(locals.episodes) { %>
+            <% episodes.forEach((episode) => { %>
+                <div class="episode-post  border p-3 m-2 rounded shadow">
+                    <form action="/episodes/<%= episode.episode_id %>" method="get" onclick="this.submit()" class="h-100">
+                        <div class="open d-flex justify-content-between">
+                            <p><%= episode.episode_date %></p>
+                            <p><%= episode.star ? '⭐' : '☆' %></p>
+                        </div>
+                    </form>
+                </div>
+            <% }); %>
+        <% }else { %>
+            <div class="no-thought mt-5 d-flex justify-content-center align-items-center">
+                <h1 style="color: #4A4A4A;">Nothing Found</h1>
+            </div>
+        <% } %>
+    </div>
+</div>
+<%- include('partials/footer.ejs') %>

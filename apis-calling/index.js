@@ -245,7 +245,7 @@ app.get("/users/:id/thoughts/:thoughts_id", async (req, res) => {
     const thoughtsid = req.params.thoughts_id;
     const result = await db.query(
       `SELECT u.id, u.username, JSON_BUILD_OBJECT(
-	'thought id', t.id,
+	'thought_id', t.id,
 	'date', t.date,
 		'star', t.star,
     'thoughts', t.feelings

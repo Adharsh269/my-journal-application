@@ -120,7 +120,7 @@ app.get("/episodes", async (req, res) => {
 			console.log(req.user.id);
 			const result = await axios.get(`http://localhost:3000/users/${userid}/episodes`);
 			const episodes = result.data.rows?.[0].posts;
-			res.render("episodes.ejs",{episodes: episodes});
+			res.render("thoughtsEpisodes.ejs",{episodes: episodes});
 		} catch (error) {
 			console.log(error);
 			res.status(500).json(error);
@@ -130,7 +130,7 @@ app.get("/episodes", async (req, res) => {
 	}
 });
 
-app.get("/episode/:id", async (req, res) => {
+app.get("/episodes/:id", async (req, res) => {
 	if(req.isAuthenticated()) {
 		const { id } = req.params;
 		const userid = req.user.id;
@@ -141,7 +141,7 @@ app.get("/episode/:id", async (req, res) => {
 			if(!result.data) {
 				return res.status(404).send("Episode not found");
 			}
-			res.render("episode.ejs", 
+			res.render("thoughtEpisode.ejs", 
 				{episode : episode}
 			)
 		} catch (error) {
@@ -156,6 +156,46 @@ app.get("/episode/:id", async (req, res) => {
 app.get("/account", (req, res) => {
 	if(req.isAuthenticated()) {
 		res.render("account.ejs", {user:req.user});
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/thoughts", async (req, res) => {
+	if(req.isAuthenticated()) {
+		try {
+			const userid = req.user.id;
+			const result = await axios.get(`http://localhost:3000/users/${userid}/thoughts`);
+			const thoughts = result.data[0];
+			// console.log(thoughts);
+			res.render("thoughtsEpisodes.ejs",{thoughts: thoughts});
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/thoughts/:id", async (req, res) => {
+	if(req.isAuthenticated()) {
+		try {
+			console.log(req.params.id);
+			const id = req.params.id;
+			const userid = req.user.id;
+			const result = await axios.get(`http://localhost:3000/users/${userid}/thoughts/${id}`);
+			const thought = result.data[0];
+			// console.log(thought);
+			if(!result.data) {
+				return res.status(404).send("Thought not found");
+			}
+			res.render("thoughtEpisode.ejs",{thought: thought})
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+			
+		}
 	} else {
 		res.redirect("/login");
 	}

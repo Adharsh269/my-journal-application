@@ -57,13 +57,13 @@ p {
 	font-size: 20px;
 }
 
-.no-episode {
+.no-episode, no-thought {
 	width: 100%;
 	height: 500px;
 	/* background-color: #ffffff; */
 }
 
-.episode-post {
+.episode-post, .thought-post {
 	width: 200px;
 	height: 200px;
 	background-color: #ffffff;
