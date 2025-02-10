@@ -310,8 +310,10 @@ WHERE u.id = $1
 GROUP BY u.id, u.username;`,
       [userid]
     );
+    // console.log(result.rows); 
     res.json(result.rows);
   } catch (err) {
+    console.log(err);
     res.json(err);
   }
 });

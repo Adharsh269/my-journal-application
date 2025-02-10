@@ -226,7 +226,7 @@ app.get("/lifegoals", async (req, res) => {
 		try {
 			const result = await axios.get(`http://localhost:3000/users/${userid}/goals`);
 			const goals = result.data[0];
-			console.log(goals);
+			// console.log(goals);
 			res.render("promptsGoals.ejs",{goals: goals});
 		} catch (error) {
 			console.log(error);
@@ -241,9 +241,10 @@ app.get("/lifegoals", async (req, res) => {
 app.get("/todo", async (req, res) => {
 	if(req.isAuthenticated()) {
 		const userid = req.user.id;
-		const result = axios.get(`http://localhost:3000/users/${userid}/todo`);
-		const todos = result.data;
-		res.json(todos);
+		const result = await axios.get(`http://localhost:3000/users/${userid}/todo`);
+		const todos = result.data[0];
+		// console.log(todos);
+		res.render("todo.ejs",{todos: todos})
 	} else {
 		res.redirect("/login");
 	}

@@ -1,0 +1,30 @@
+<%- include('partials/header.ejs') %>
+    <div class="container">
+        <h1>Todo</h1>
+        <div class="heading d-flex justify-content-between bg-dark mt-5 w-100 p-3">
+            <div class="w-auto"></div>
+            <h2 class="w-50">Todo</h2>
+            <h2 class="w-25">Start</h2>
+            <h2 class="w-25">End</h2>
+        </div>
+        <div class="bg-light w-100 p-3">
+            <% if(locals.todos) { %>
+                <% todos.items.forEach((item) => { %>
+                    <div class="item d-flex justify-content-between">
+                        <form action="/completed" method="get" onclick="this.submit()" class="w-auto">
+                            <input type="checkbox" name="completed" id="todo-completed" >
+                        </form>
+                        <div class="w-50"><p><%= item.todo_item %></p></div>
+                        <div class="w-25"><p><%= item.start.slice(0,10) %> <%= item.start.slice(12,19) %></p></div>
+                        <div class="w-25"><p><%= item.end.slice(0,10) %> <%= item.end.slice(12,19) %></p></div>
+                        
+                    </div>
+                    <hr style="height: 1px;">
+                <% }) %>
+            <% } %>
+        </div>
+        <form action="/addtodo" method="get" class="mt-5" onclick="this.submit()">
+            <button class="btn btn-primary">Add Todo</button>
+        </form>
+    </div>
+<%- include('partials/footer.ejs') %>

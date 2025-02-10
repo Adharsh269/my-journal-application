@@ -77,3 +77,18 @@ li {
 	font-size: 25px;
 	color: #44423D;
 }
+
+.heading h2{
+	color: #ffffff;
+	text-align: center;
+}
+
+#todo-completed{
+	width: 20px;
+	height: 20px;
+	/* align-self: center; */
+}
+
+.item {
+	text-align: center;
+}
