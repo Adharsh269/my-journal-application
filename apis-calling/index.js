@@ -204,7 +204,7 @@ app.get("/users/:id/goals", async (req, res) => {
       GROUP BY u.id, u.username`,
       [userid]
     );
-    console.log(result.rows);
+    // console.log(result.rows);
     res.json(result.rows);
   } catch (err) {
     res.json(err);

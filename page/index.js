@@ -238,6 +238,17 @@ app.get("/lifegoals", async (req, res) => {
 	}
 });
 
+app.get("/todo", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const userid = req.user.id;
+		const result = axios.get(`http://localhost:3000/users/${userid}/todo`);
+		const todos = result.data;
+		res.json(todos);
+	} else {
+		res.redirect("/login");
+	}
+});
+
 passport.serializeUser((user, cb) => {
 	cb(null, user);
 });
