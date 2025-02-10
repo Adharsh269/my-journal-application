@@ -79,7 +79,7 @@ app.get("/users/:id/episodes", async (req, res) => {
             GROUP BY u.id, u.username `,
       [userid]
     );
-    res.json(result);
+    res.json(result.rows);
   } catch (err) {
     res.send(err);
   }
@@ -143,8 +143,8 @@ app.get("/users/:id/star/episodes", async (req, res) => {
       `SELECT  u.id,u.username,
             COALESCE(JSON_AGG(
                     JSON_BUILD_OBJECT(
-                        'episode id', e.episode_id,
-                        'episode date', e.episode_date,
+                        'episode_id', e.episode_id,
+                        'episode_date', e.episode_date,
                         'star', e.star,
                         'mood', e.mood,
                         'wentwell', e.wentwell,

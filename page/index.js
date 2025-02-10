@@ -118,9 +118,10 @@ app.get("/episodes", async (req, res) => {
 	if(req.isAuthenticated()) {
 		try {
 			const userid = req.user.id;
-			console.log(req.user.id);
+			// console.log(req.user.id);
 			const result = await axios.get(`http://localhost:3000/users/${userid}/episodes`);
-			const episodes = result.data.rows?.[0].posts;
+			const episodes = result.data[0];
+			// console.log(episodes);
 			res.render("thoughtsEpisodes.ejs",{episodes: episodes});
 		} catch (error) {
 			console.log(error);
@@ -135,7 +136,7 @@ app.get("/episodes/:id", async (req, res) => {
 	if(req.isAuthenticated()) {
 		const { id } = req.params;
 		const userid = req.user.id;
-		console.log(userid," ",id);
+		// console.log(userid," ",id);
 		try {
 			const result = await axios.get(`http://localhost:3000/users/${userid}/episodes/${id}`);
 			const episode = result.data[0];
@@ -182,7 +183,7 @@ app.get("/thoughts", async (req, res) => {
 app.get("/thoughts/:id", async (req, res) => {
 	if(req.isAuthenticated()) {
 		try {
-			console.log(req.params.id);
+			// console.log(req.params.id);
 			const id = req.params.id;
 			const userid = req.user.id;
 			const result = await axios.get(`http://localhost:3000/users/${userid}/thoughts/${id}`);
@@ -245,6 +246,26 @@ app.get("/todo", async (req, res) => {
 		const todos = result.data[0];
 		// console.log(todos);
 		res.render("todo.ejs",{todos: todos})
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/star", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const userid = req.user.id;
+		const option = req.query.option;
+		console.log(option);
+		if(option === "thoughts") {
+			const result = await axios.get(`http://localhost:3000/users/${userid}/star/${option}`);
+			const thoughts = result.data[0];
+			res.render("thoughtsEpisodes.ejs",{thoughts: thoughts});
+		} else if (option === "episodes") {
+			const result = await axios.get(`http://localhost:3000/users/${userid}/star/${option}`);
+			const episodes = result.data[0];
+			// console.log(episodes);
+			res.render("thoughtsEpisodes.ejs",{episodes: episodes});
+		}
 	} else {
 		res.redirect("/login");
 	}

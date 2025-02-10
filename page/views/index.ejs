@@ -1,6 +1,6 @@
 <%- include('partials/header.ejs') %>
 <main>
-	<div class="container-fluid d-flex justify-content-around flex-wrap mt-5">
+	<div class="container-fluid d-flex justify-content-evenly flex-wrap mt-5">
 		<div class="episode box  rounded">
 			<form action="/episodes" method="get" onclick="this.submit()" class="h-100">
 				<label for="episode" class="p-3 w-100">Write The episode</label>
@@ -15,13 +15,13 @@
 				<p class="p-3">At any movement in your life, if any feeling arise in your mind. They can be any emotion. Share it here, you can check it out when ever you want.</p>
 			</form>
 		</div>
-		<div class="rated box  rounded">
+		<!-- <div class="rated box  rounded">
 			<form action="/star" method="get" onclick="this.submit()" class="h-100">
 				<label for="rated" class="p-3 w-100">Stared</label>
 				<hr class="border-5 border-dark opacity-100 m-0">
 				<p class="p-3">Important posts from Episodes and What is On your Mind ? can be found here. You are stared them while posting them. </p>
 			</form>
-		</div>
+		</div> -->
 		<div class="prompts box  rounded">
 			<form action="/prompts" method="get" onclick="this.submit()" class="h-100">
 				<label for="prompts" class="p-3 w-100">Prompts</label>
