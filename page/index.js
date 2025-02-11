@@ -225,6 +225,7 @@ app.get("/lifegoals", async (req, res) => {
 	if(req.isAuthenticated()) {
 		const userid = req.user.id;
 		try {
+			console.log(userid);
 			const result = await axios.get(`http://localhost:3000/users/${userid}/goals`);
 			const goals = result.data[0];
 			// console.log(goals);
@@ -265,6 +266,39 @@ app.get("/star", async (req, res) => {
 			const episodes = result.data[0];
 			// console.log(episodes);
 			res.render("thoughtsEpisodes.ejs",{episodes: episodes});
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/completed/:id", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const userid = req.user.id;
+		const id  = req.params.id;
+		try {
+			await axios.delete(`http://localhost:3000/users/${userid}/todo/${id}`);
+		res.redirect("/todo");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/goalcompleted/:goal_id", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const userid = req.user.id;
+		const id  = req.params.goal_id;
+		// console.log(userid," ",id);
+		try {
+			await axios.patch(`http://localhost:3000/users/${userid}/goals/${id}/completed`);
+			res.redirect("/lifegoals");	
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
 		}
 	} else {
 		res.redirect("/login");

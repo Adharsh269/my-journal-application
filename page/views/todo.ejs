@@ -11,8 +11,8 @@
             <% if(locals.todos) { %>
                 <% todos.items.forEach((item) => { %>
                     <div class="item d-flex justify-content-between">
-                        <form action="/completed" method="get" onclick="this.submit()" class="w-auto">
-                            <input type="checkbox" name="completed" id="todo-completed" >
+                        <form action="/completed/<%= item.id %>" method="get" onclick="this.submit()" class="w-auto">
+                            <input type="checkbox" name="completed" id="todo-completed" onclick="onChecked()">
                         </form>
                         <div class="w-50"><p><%= item.todo_item %></p></div>
                         <div class="w-25"><p><%= item.start.slice(0,10) %> <%= item.start.slice(12,19) %></p></div>

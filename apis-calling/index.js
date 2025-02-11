@@ -197,9 +197,15 @@ app.get("/users/:id/goals", async (req, res) => {
     const userid = req.params.id;
     const result = await db.query(
       `SELECT u.id, u.username,  
-      JSON_AGG(DISTINCT lg.list) as lifegoals 
+      JSON_AGG(
+	  	   JSON_BUILD_OBJECT(
+            'id', lg.id, 
+            'goal', lg.list,
+            'completed', lg.completed
+        )
+	  ) AS lifegoals
       FROM users as u 
-      JOIN lifegoals as lg ON lg.user_id = u.id 
+      JOIN lifegoals as lg ON lg.user_id = u.id
       WHERE u.id = $1 
       GROUP BY u.id, u.username`,
       [userid]
@@ -208,6 +214,7 @@ app.get("/users/:id/goals", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     res.json(err);
+    res.status(500).json(err);
   }
 });
 
@@ -458,8 +465,8 @@ app.post("/users/:id/lifegoals", async (req, res) => {
     const goal = req.body.goal;
     console.log(goal);    
     await db.query("BEGIN");
-    await db.query(`INSERT INTO lifegoals(list, user_id)
-      VALUES ($1, $2)`, [goal, userid]);
+    await db.query(`INSERT INTO lifegoals(list, user_id, completed)
+      VALUES ($1, $2, false)`, [goal, userid]);
     await db.query("COMMIT");
     res.status(201).json({message:"goal is updated to the database."})
   } catch(err) {
@@ -507,7 +514,7 @@ app.delete("/users/:id/todo/:todo_id", async (req, res) => {
   try {
     const userid = req.params.id;
     const todoid = req.params.todo_id;
-    console.log(userid," ",todoid);
+    // console.log(userid," ",todoid);
     const result = await db.query(`DELETE FROM todo WHERE todo.id = $1 AND todo.user_id = $2 `, [todoid, userid]); 
     if(result.rowCount === 0) {
       return res.status(400).json({message:"Todo does not there or it is does not belong to the user."})
@@ -576,6 +583,20 @@ app.patch("/users/:id/todo/:todo_id", async (req, res) => {
       return res.status(404).json({message:"Todo not found"});
     }
     res.status(200).json({message:"Todo is updated."});
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+app.patch("/users/:id/goals/:goals_id/completed", async (req, res) => {
+  try {
+    const {id, goals_id} = req.params;
+    await db.query(`UPDATE lifegoals 
+      SET completed = NOT completed
+      WHERE lifegoals.id = $1 AND lifegoals.user_id = $2 RETURNING *`,
+    [goals_id, id]);
+        return res.status(200).json({message:"Goal is marked as completed."});
   } catch (err) {
     console.log(err);
     res.status(500).json(err);

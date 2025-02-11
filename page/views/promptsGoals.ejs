@@ -1,31 +1,50 @@
 <%- include('partials/header.ejs') %>
-    <div class="container">
-        <div class="d-flex flex-column">
-            <div class="mt-5 bg-dark p-2">
-                <h1 class="text-light"><%- locals.prompts ? "Prompts" : locals.goals ? "Life Goals" : "Nothing" %></h1>
-            </div>
-            <% if(locals.prompts) { %>
-                <% prompts.prompts.forEach((prompt) => { %>
-                    <div class="bg-light p-3">
-                        <h3 style="color: #44423D;" class="mt-2"><%- prompt ? `<li contentEditable="true" class="ps-4">${prompt}</li>` : "No prompts" %></h3>
-                        <hr style="height: 1px;">
-                    </div>
-                <% }) %>
-                <div class="mt-5"   >
-                    <button class="btn btn-primary">Add Prompt</button>
-                </div>
-            <% } else if( locals.goals) { %>
-                <% goals.lifegoals.forEach((lg) => { %>
-                    <div class=" bg-light p-3">
-                        <h3 style="color: #44423D;" ><%- lg ? `<li contentEditable="true" class="ps-4">${lg}</li>` : "No prompts" %></h3>
-                    
+<div class="container">
+    <div class="d-flex flex-column">
+        <div class="mt-5 bg-dark p-2">
+            <h1 class="text-light"><%= locals.prompts ? "Prompts" : locals.goals ? "Life Goals" : "Nothing" %></h1>
+        </div>
+
+        <% if (locals.prompts) { %>
+            <% locals.prompts.forEach((prompt) => { %>
+                <div class="bg-light p-3">
+                    <h3 style="color: #44423D;" class="mt-2">
+                        <% if (prompt) { %>
+                            <li contentEditable="true" class="ps-4"><%= prompt %></li>
+                        <% } else { %>
+                            No prompts
+                        <% } %>
+                    </h3>
                     <hr style="height: 1px;">
                 </div>
-                <% }) %>
-                <div class="mt-5"   >
-                    <button class="btn btn-primary">Add Goal</button>
+            <% }) %>
+            <div class="mt-5">
+                <button class="btn btn-primary">Add Prompt</button>
+            </div>
+
+        <% } else if (locals.goals) { %>
+            <% locals.goals.lifegoals.forEach((lg) => { %>
+                <div class="bg-light p-3">
+                    <form action="/goalcompleted/<%= lg.id %>" method="get">
+                        <button type="submit" style="all: unset; cursor: pointer; width: 100%;">
+                            <h3 style="color: #44423D;">
+                                <% if (lg) { %>
+                                    <li contentEditable="true" class="ps-4" style="text-decoration: <%= lg.completed ? 'line-through' : 'none' %>;">
+                                        <%= lg.goal %>
+                                    </li>
+                                <% } else { %>
+                                    No goals
+                                <% } %>
+                            </h3>
+                        </button>
+                    </form>
+                    <hr style="height: 1px;">
                 </div>
-            <% } %>
-        </div>
+            <% }) %>
+            <div class="mt-5">
+                <button class="btn btn-primary">Add Goal</button>
+            </div>
+        <% } %>
     </div>
+</div>
 <%- include('partials/footer.ejs') %>
