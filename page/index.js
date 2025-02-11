@@ -5,7 +5,8 @@ import bcrypt from "bcrypt";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import session from "express-session";
-import e from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 env.config();
@@ -27,7 +28,9 @@ app.use(express.urlencoded({extended:true}));
 app.use(express.static("public"));
 app.use(passport.initialize());
 app.use(passport.session());
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/add')]);
 
 app.get("/", (req, res) => {
 	req.isAuthenticated() ? res.redirect("/home") : res.redirect("/login");
@@ -209,7 +212,7 @@ app.get("/prompts", async (req, res) => {
 		try {
 			const result = await axios.get(`http://localhost:3000/users/${userid}/prompts`);
 			const prompts = result.data[0];
-			// console.log(prompts);
+			console.log(prompts);
 			res.render("promptsGoals.ejs",{prompts: prompts});
 		} catch (error) {
 			console.log(error);
@@ -296,6 +299,89 @@ app.get("/goalcompleted/:goal_id", async (req, res) => {
 		try {
 			await axios.patch(`http://localhost:3000/users/${userid}/goals/${id}/completed`);
 			res.redirect("/lifegoals");	
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/newgoal", (req, res) => {
+	if(req.isAuthenticated()) {
+		res.render("addPromptsGoals.ejs", {type:"goal"});
+	} else {
+		res.redirect("/login");
+	}
+})
+
+app.post("/addgoal", async (req, res) => {
+	if(req.isAuthenticated()) {
+		try {
+			const {goal} = req.body;
+			const userid = req.user.id;
+			console.log(goal);
+
+			await axios.post(`http://localhost:3000/users/${userid}/lifegoals`, {
+				goal:goal
+			});
+			res.redirect("/lifegoals");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/newprompt", async (req, res) => {
+	if(req.isAuthenticated()) {
+		res.render("addPromptsGoals.ejs", {type:"prompt"});
+	} else {
+
+	}
+});
+
+app.post("/addprompt", async (req, res) => {
+	if(req.isAuthenticated()) {
+		try {
+			const {prompt} = req.body;
+			const userid = req.user.id;
+
+			await axios.post(`http://localhost:3000/users/${userid}/prompts`, {
+				prompt:prompt
+			});
+			res.redirect("/prompts");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/addtodo", async (req, res) => {
+	if(req.isAuthenticated()) {
+		res.render("addtodo.ejs");
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.post("/newtodo", async (req, res) => {
+	if(req.isAuthenticated()) {
+		try {
+			const userid = req.user.id;
+			const {todo, end} = req.body;
+			console.log(todo, end);
+			await axios.post(`http://localhost:3000/users/${userid}/todo`,{
+				todo:todo,
+				end:end
+			});
+			res.redirect("/todo");
 		} catch (error) {
 			console.log(error);
 			res.status(500).json(error);

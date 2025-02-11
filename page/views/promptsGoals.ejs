@@ -6,7 +6,7 @@
         </div>
 
         <% if (locals.prompts) { %>
-            <% locals.prompts.forEach((prompt) => { %>
+            <% prompts.prompts.forEach((prompt) => { %>
                 <div class="bg-light p-3">
                     <h3 style="color: #44423D;" class="mt-2">
                         <% if (prompt) { %>
@@ -19,7 +19,9 @@
                 </div>
             <% }) %>
             <div class="mt-5">
-                <button class="btn btn-primary">Add Prompt</button>
+                <form action="/newprompt" method="get">
+                    <button class="btn btn-primary" role="submit">Add Prompt</button>
+                </form>
             </div>
 
         <% } else if (locals.goals) { %>
@@ -42,7 +44,9 @@
                 </div>
             <% }) %>
             <div class="mt-5">
-                <button class="btn btn-primary">Add Goal</button>
+                <form action="/newgoal" method="get">
+                    <button class="btn btn-primary" role="submit">Add Goal</button>
+                </form>
             </div>
         <% } %>
     </div>

@@ -308,7 +308,6 @@ app.get("/users/:id/todo", async (req, res) => {
 	JSON_BUILD_OBJECT( 
 	'id', td.id,
 	'todo_item',td.todo_item, 	
-	'start',td.todo_start, 	
 	'end',td.todo_end ) --
 )AS items 
 FROM users as u 
@@ -482,21 +481,26 @@ app.post("/users/:id/todo", async (req, res) => {
   try {
     const userid = req.params.id;
     let todo = req.body.todo;
-    const start = req.body.start;
-    const end = req.body.end;
+    let end = req.body.end;
 
     if (!Array.isArray(todo)) {
       todo = todo ? [todo] : [];
     }
-
+    if (!Array.isArray(end)) {
+      end = end ? [end] : [];
+    }
+    console.log(todo, end);
     if (!todo.length) {
       return res.status(400).json({ message: "Todo list cannot be empty." });
     }
+    if (!end.length) {
+      return res.status(400).json({ message: "Todo end cannot be empty." });
+    }
     await db.query("BEGIN");
-    const values = todo.map((item, index) => `($${index * 4 + 1}, $${index * 4 + 2}, $${index * 4 + 3}, $${index * 4 + 4})`).join(",");
-    const queryParamas = todo.flatMap((item) => [item, userid, start, end]);
+    const values = todo.map((item, index) => `($${index * 3 + 1}, $${index * 3 + 2}, $${index * 3 + 3})`).join(",");
+    const queryParamas = todo.flatMap((item, index) => [item, userid, end[index]]);
 
-    const queryText = `INSERT INTO todo (todo_item, user_id, todo_start, todo_end) VALUES ${values}`;
+    const queryText = `INSERT INTO todo (todo_item, user_id, todo_end) VALUES ${values}`;
 
     await db.query(queryText, queryParamas);
     
