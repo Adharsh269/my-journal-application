@@ -1,54 +1,72 @@
 <%- include('partials/header.ejs') %>
 <div class="container">
-    <div class="d-flex flex-column">
-        <div class="mt-5 bg-dark p-2">
-            <h1 class="text-light"><%= locals.prompts ? "Prompts" : locals.goals ? "Life Goals" : "Nothing" %></h1>
-        </div>
-
-        <% if (locals.prompts) { %>
-            <% prompts.prompts.forEach((prompt) => { %>
-                <div class="bg-light p-3">
-                    <h3 style="color: #44423D;" class="mt-2">
-                        <% if (prompt) { %>
-                            <li contentEditable="true" class="ps-4"><%= prompt %></li>
-                        <% } else { %>
-                            No prompts
-                        <% } %>
-                    </h3>
-                    <hr style="height: 1px;">
-                </div>
-            <% }) %>
-            <div class="mt-5">
-                <form action="/newprompt" method="get">
-                    <button class="btn btn-primary" role="submit">Add Prompt</button>
-                </form>
-            </div>
-
-        <% } else if (locals.goals) { %>
-            <% locals.goals.lifegoals.forEach((lg) => { %>
-                <div class="bg-light p-3">
-                    <form action="/goalcompleted/<%= lg.id %>" method="get">
-                        <button type="submit" style="all: unset; cursor: pointer; width: 100%;">
-                            <h3 style="color: #44423D;">
-                                <% if (lg) { %>
-                                    <li contentEditable="true" class="ps-4" style="text-decoration: <%= lg.completed ? 'line-through' : 'none' %>;">
-                                        <%= lg.goal %>
-                                    </li>
-                                <% } else { %>
-                                    No goals
-                                <% } %>
-                            </h3>
-                        </button>
-                    </form>
-                    <hr style="height: 1px;">
-                </div>
-            <% }) %>
-            <div class="mt-5">
-                <form action="/newgoal" method="get">
-                    <button class="btn btn-primary" role="submit">Add Goal</button>
-                </form>
-            </div>
-        <% } %>
+  <div class="d-flex flex-column">
+    <div class="mt-5 bg-dark p-2">
+      <h1 class="text-light">
+        <%= locals.prompts ? "Prompts" : locals.goals ? "Life Goals" : "Nothing"
+        %>
+      </h1>
     </div>
+
+    <div class="prompts">
+			<% if (locals.prompts) { %> 
+				<% prompts.prompts.forEach((prompt) => { %>
+				<div class="bg-light p-3">
+					<h3 style="color: #44423d" class="mt-2">
+						<% if (prompt) { %>
+						<li contentEditable="true" class="ps-4"><%= prompt %></li>
+						<% } else { %> No prompts <% } %>
+					</h3>
+					<hr style="height: 1px" class="m-1"/>
+				</div>
+				<% }) %>
+				<div class="bg-light">
+					<!-- <form action="/newgoal" method="get">
+													<button class="btn btn-primary" role="submit">Add Goal</button>
+											</form> -->
+					<form action="/addprompt" method="post" class="d-flex justify-content-between align-items-center p-2 gap-3">
+						<input type="text" name="prompt" class="form-control border-0 w-75" placeholder="Enter your goal here" style="font-size: 25px;" required>
+						<button class="btn btn-primary btn-lg w-0" type="submit">Add Prompt</button>
+					</form>
+				</div>
+		</div>
+
+    <% } else if (locals.goals) { %>
+    <div class="goals ">
+      <% locals.goals.lifegoals.forEach((lg) => { %>
+      <div class="bg-light p-2">
+        <form action="/goalcompleted/<%= lg.id %>" method="get">
+          <button
+            type="submit"
+            style="all: unset; cursor: pointer; width: 100%"
+          >
+            <h3 style="color: #44423d">
+              <% if (lg) { %>
+              <li
+                contentEditable="true"
+                class="ps-4"
+                style="text-decoration: <%= lg.completed ? 'line-through' : 'none' %>;"
+              >
+                <%= lg.goal %>
+              </li>
+              <% } else { %> No goals <% } %>
+            </h3>
+          </button>
+        </form>
+        <hr style="height: 1px" class="m-1"/>
+      </div>
+      <% }) %>
+      <div class="bg-light">
+        <!-- <form action="/newgoal" method="get">
+                        <button class="btn btn-primary" role="submit">Add Goal</button>
+                    </form> -->
+        <form action="/addgoal" method="post" class="d-flex justify-content-between align-items-center p-2 gap-3">
+					<input type="text" name="goal" class="form-control border-0 w-75" required placeholder="Enter your goal here" style="font-size: 25px;">
+					<button class="btn btn-primary btn-lg w-0" type="submit">Add Goal</button>
+				</form>
+      </div>
+    </div>
+    <% } %>
+  </div>
 </div>
 <%- include('partials/footer.ejs') %>

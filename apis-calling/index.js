@@ -181,7 +181,7 @@ app.get("/users/:id/prompts", async (req, res) => {
     const result = await db.query(
       `SELECT u.id, u.username, 
       JSON_AGG(DISTINCT p.list) as prompts 
-      FROM users AS u JOIN prompts AS p ON u.id = p.user_id 
+      FROM users AS u LEFT JOIN prompts AS p ON u.id = p.user_id 
       WHERE u.id = $1 
       GROUP BY u.id, u.username;`,
       [userid]
@@ -205,7 +205,7 @@ app.get("/users/:id/goals", async (req, res) => {
         )
 	  ) AS lifegoals
       FROM users as u 
-      JOIN lifegoals as lg ON lg.user_id = u.id
+      LEFT JOIN lifegoals as lg ON lg.user_id = u.id
       WHERE u.id = $1 
       GROUP BY u.id, u.username`,
       [userid]
@@ -230,9 +230,9 @@ app.get("/users/:id/thoughts", async (req, res) => {
 			'date', t.date,
 			'feelings', t.feelings
 		)
-	) FILTER (WHERE thought_id is not null), '[]'::json) as posts
+	) FILTER (WHERE t.thought_id is not null), '[]'::json) as posts
 FROM users AS u
-JOIN(
+LEFT JOIN(
 	SELECT t.id AS thought_id, t.user_id, t.star, t.date, t.feelings
 	FROM thoughts AS t
 ) AS t ON t.user_id = u.id
@@ -258,7 +258,7 @@ app.get("/users/:id/thoughts/:thoughts_id", async (req, res) => {
     'thoughts', t.feelings
 	) AS post
   FROM users as u
-            JOIN thoughts AS t ON t.user_id = u.id
+            LEFT JOIN thoughts AS t ON t.user_id = u.id
             WHERE u.id = $1 and t.id = $2
             GROUP BY u.id, u.username, t.id;`,
       [userid, thoughtsid]
@@ -311,7 +311,7 @@ app.get("/users/:id/todo", async (req, res) => {
 	'end',td.todo_end ) --
 )AS items 
 FROM users as u 
-JOIN todo as td ON td.user_id = u.id
+LEFT JOIN todo as td ON td.user_id = u.id
 WHERE u.id = $1
 GROUP BY u.id, u.username;`,
       [userid]
@@ -329,9 +329,9 @@ app.post("/users/:id/episodes", async(req, res) => {
     const userid = req.params.id;
     const {star, mood} = req.body;
 
-    const wentwell = Array.isArray(req.body.wentwell) ? req.body.wentwell : [];
-    const wentwrong = Array.isArray(req.body.wentwrong) ? req.body.wentwrong : [];
-    const learning = Array.isArray(req.body.learning) ? req.body.learning : [];
+    const wentwell = Array.isArray(req.body.wentwell) ? req.body.wentwell : [req.body.wentwell];
+    const wentwrong = Array.isArray(req.body.wentwrong) ? req.body.wentwrong : [req.body.wentwrong];
+    const learning = Array.isArray(req.body.learning) ? req.body.learning : [req.body.learning];
 
     await db.query("BEGIN");
     const result = await db.query(`

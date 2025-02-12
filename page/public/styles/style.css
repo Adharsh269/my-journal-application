@@ -1,93 +1,147 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Ranga:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Ranga:wght@400;700&display=swap");
 body {
-	padding: 0;
-	margin: 0;
-	background-color: #d9d9d9;
+  padding: 0;
+  margin: 0;
+  background-color: #d9d9d9;
 }
 
 .nav {
-	background-color: #343434;
-	height: 100px;
-	align-content: center;
+  background-color: #343434;
+  height: 100px;
+  align-content: center;
 }
 
 .nav-img {
-	width: 60px;
+  width: 60px;
 }
 
-.start, .end {
-	display: flex;
-	gap: 7px;
-	align-items: center;
+.start,
+.end {
+  display: flex;
+  gap: 7px;
+  align-items: center;
 }
 
 h1 > a {
-	text-decoration: none;
-	font-family: "Ranga", serif;
-	color: #d9d9d9;
-	font-size: 80px;
+  text-decoration: none;
+  font-family: "Ranga", serif;
+  color: #d9d9d9;
+  font-size: 80px;
 }
-h1, h2, h3, p{
-	font-family: "Montserrat", serif;
+h1,
+h2,
+h3,
+p {
+  font-family: "Montserrat", serif;
 }
 
 .box {
-	width: 450px;
-	height: 300px;
-	margin:30px;
-	background-color: #ffffff;
+  width: 450px;
+  height: 300px;
+  margin: 30px;
+  background-color: #ffffff;
 }
 
 label {
-	height: 80px;
-	font-family: "Montserrat", serif;
-	font-size: 30px;
-	font-weight: bold;
+  height: 80px;
+  font-family: "Montserrat", serif;
+  font-size: 30px;
+  font-weight: bold;
 }
 
-hr{
-	color: #000;
-	background-color: #000;
-	height: 3px;
-	border: none;
+hr {
+  color: #000;
+  background-color: #000;
+  height: 3px;
+  border: none;
 }
 p {
-	font-weight: normal;
-	font-size: 20px;
+  font-weight: normal;
+  font-size: 20px;
 }
 
-.no-episode, no-thought {
-	width: 100%;
-	height: 500px;
-	/* background-color: #ffffff; */
+.no-episode,
+no-thought {
+  width: 100%;
+  height: 500px;
+  /* background-color: #ffffff; */
 }
 
-.episode-post, .thought-post {
-	width: 200px;
-	height: 200px;
-	background-color: #ffffff;
+.episode-post,
+.thought-post {
+  width: 200px;
+  height: 200px;
+  background-color: #ffffff;
 }
 
 [contenteditable] {
-	outline: 0px solid transparent;
+  outline: 0px solid transparent;
 }
 
 li {
-	font-size: 25px;
-	color: #44423D;
+  font-size: 25px;
+  color: #44423d;
 }
 
-.heading h2{
-	color: #ffffff;
-	text-align: center;
+.heading h2 {
+  color: #ffffff;
+  text-align: center;
 }
 
-#todo-completed{
-	width: 20px;
-	height: 20px;
-	/* align-self: center; */
+#todo-completed {
+  width: 20px;
+  height: 20px;
+  /* align-self: center; */
 }
 
 .item {
-	text-align: center;
+  text-align: center;
+}
+
+.rating {
+  display: flex;
+  flex-direction: row-reverse;
+  width: 50px;
+  height: 20px;
+}
+
+.rating label {
+  display: flex;
+  flex: 1;
+  position: relative;
+  cursor: pointer;
+ 
+}
+.rating label:after {
+  font-family: 'FontAwesome';
+  transition: all 0.4s ease-out;
+  -webkit-font-smoothing: antialiased;
+  position: absolute;
+  content: "\f006";
+  color: #777;
+  top: 0;
+  left: 0;
+  /* width: 100%;
+  height: 100%; */
+  text-align: center;
+  font-size: 20px;
+  line-height: 1; 
+}
+.rating input {
+  display: none;
+}
+.rating input:checked + label:after,
+.rating input:checked ~ label:after {
+  content: "\f005";
+  color: #F9BF3B  ;
+  text-shadow: 0 0 10px #F9BF3B, 2px 2px 2px rgb(0, 0, 0, 0.6);
+}
+.rating input:not(:checked) + label:after,
+.rating input:not(:checked) ~ label:after {
+  content: "\f005";
+  text-shadow: none;
+}
+
+label [id="r-1"] {
+  height: 10px;
 }

@@ -1,0 +1,31 @@
+<%- include('../partials/header.ejs') %>
+    <div class="container pt-5">
+        <div class="heading">
+            <h1>I've got something on my mind...</h1>
+        </div>
+        <div class="write-thought">
+            <form action="/addthought" method="post">
+                <div class="form-floating">
+                    <textarea name="feelings" id="feelings" cols="70" rows="10" class="form-control fs-3" placeholder="Write down your thoughts" style="height: 200px;" required></textarea>
+                </div>
+                <div class="d-flex mt-2">
+                    <div class="rating d-inline">
+                        <input type="checkbox" name="star" id="r-1" value="false" >
+                        <label for="r-1" id="r-1"></label>
+                    </div>
+                    <button class="btn btn-lg btn-primary" onclick="onRated()">Add Thought</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        function onRated() {
+            let checkbox = document.getElementById("r-1");
+            console.log(checkbox);
+            if(checkbox.checked) {
+                checkbox.value = "true";
+            }
+            console.log(checkbox.value);
+        }
+    </script>
+<%- include('../partials/footer.ejs') %>

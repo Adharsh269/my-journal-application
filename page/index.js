@@ -7,11 +7,12 @@ import { Strategy } from "passport-local";
 import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
+import { json } from "stream/consumers";
 
 const app = express();
 env.config();
 const port = process.env.PORT;
-const saltRounds = process.env.SALTROUNDS;
+const saltRounds = parseInt(process.env.SALT_ROUNDS, 10);
 
 app.use(
 	session({
@@ -64,17 +65,19 @@ app.get("/logout", (req, res, next) => {
 });
 
 app.post("/register", async (req, res) => {
-	const { username, email, password } = req.body;
+	const { username, email, password, confirmpassword } = req.body;
+	if(password !== confirmpassword) {
+		res.redirect("/register");	
+	}
 	try {
 		const checkResult = await axios.get(`http://localhost:3000/users?email=${encodeURIComponent(email)}`);
 		const userExists = Array.isArray(checkResult.data.rows) ? checkResult.data.rows.length > 0 : false;
 		if(userExists) {
 			return res.redirect("/login");
 		}
-		if(password !== confirmpassword) {
-			res.redirect("/register");	
-		}
+		
 		const hashedPassword = await bcrypt.hash(password, saltRounds);
+		// console.log(hashedPassword);
 		const result = await axios.post("http://localhost:3000/users",{
 				username,
 				email,
@@ -86,7 +89,7 @@ app.post("/register", async (req, res) => {
 				console.error("Login error:", err);
 				return res.status(500).send("Error logging in");
 			}			
-			console.log("success");
+			// console.log("success");
 			res.redirect("/home");
 		});
 	} catch (error) {
@@ -124,7 +127,6 @@ app.get("/episodes", async (req, res) => {
 			// console.log(req.user.id);
 			const result = await axios.get(`http://localhost:3000/users/${userid}/episodes`);
 			const episodes = result.data[0];
-			// console.log(episodes);
 			res.render("thoughtsEpisodes.ejs",{episodes: episodes});
 		} catch (error) {
 			console.log(error);
@@ -172,7 +174,7 @@ app.get("/thoughts", async (req, res) => {
 			const userid = req.user.id;
 			const result = await axios.get(`http://localhost:3000/users/${userid}/thoughts`);
 			const thoughts = result.data[0];
-			// console.log(thoughts);
+			
 			res.render("thoughtsEpisodes.ejs",{thoughts: thoughts});
 		} catch (error) {
 			console.log(error);
@@ -308,14 +310,6 @@ app.get("/goalcompleted/:goal_id", async (req, res) => {
 	}
 });
 
-app.get("/newgoal", (req, res) => {
-	if(req.isAuthenticated()) {
-		res.render("addPromptsGoals.ejs", {type:"goal"});
-	} else {
-		res.redirect("/login");
-	}
-})
-
 app.post("/addgoal", async (req, res) => {
 	if(req.isAuthenticated()) {
 		try {
@@ -333,14 +327,6 @@ app.post("/addgoal", async (req, res) => {
 		}
 	} else {
 		res.redirect("/login");
-	}
-});
-
-app.get("/newprompt", async (req, res) => {
-	if(req.isAuthenticated()) {
-		res.render("addPromptsGoals.ejs", {type:"prompt"});
-	} else {
-
 	}
 });
 
@@ -363,15 +349,7 @@ app.post("/addprompt", async (req, res) => {
 	}
 });
 
-app.get("/addtodo", async (req, res) => {
-	if(req.isAuthenticated()) {
-		res.render("addtodo.ejs");
-	} else {
-		res.redirect("/login");
-	}
-});
-
-app.post("/newtodo", async (req, res) => {
+app.post("/addtodo", async (req, res) => {
 	if(req.isAuthenticated()) {
 		try {
 			const userid = req.user.id;
@@ -385,6 +363,76 @@ app.post("/newtodo", async (req, res) => {
 		} catch (error) {
 			console.log(error);
 			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/newthought", async (req, res) => {
+	if(req.isAuthenticated()) {
+		try {
+			res.render("addThought.ejs");
+		} catch (error) {
+			console.log(error);
+			res.json(500).send(err);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.post("/addthought", async (req, res) => {
+	if(req.isAuthenticated()) {
+		try {
+			const userid = req.user.id;
+			const {feelings, star = "false"} = req.body;
+			await axios.post(`http://localhost:3000/users/${userid}/thoughts`,{
+				feelings:feelings,
+				star:star
+			})
+			res.redirect("/thoughts");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.get("/newepisode", async (req, res) => {
+	if(req.isAuthenticated()) {
+		try {
+			res.render("addEpisode.ejs");
+		} catch (error) {
+			console.log(error);
+			res.json(500).send(err);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.post("/addepisode", async (req, res) => {
+	if(req.isAuthenticated()) {
+		try {
+			const userid = req.user.id;
+			const {wentwell = [], wentwrong = [], learning = [], mood, star  = "false"} = req.body;
+			// console.log(wentwell, wentwrong, learning, mood, star);
+
+			await axios.post(`http://localhost:3000/users/${userid}/episodes`,{
+				wentwell:wentwell,
+				wentwrong:wentwrong,
+				learning:learning,
+				mood:mood,
+				star:star
+			});
+
+			res.redirect("/episodes");
+		} catch (error) {
+			console.log(error);
+			res.status(500).send(json);
 		}
 	} else {
 		res.redirect("/login");

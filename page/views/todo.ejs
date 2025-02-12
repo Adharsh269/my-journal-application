@@ -1,28 +1,35 @@
 <%- include('partials/header.ejs') %>
     <div class="container">
         <h1>Todo</h1>
-        <div class="heading d-flex justify-content-between bg-dark mt-5 w-100 p-3">
-            <div class="w-auto"></div>
+        <div class="heading d-flex justify-content-between bg-dark mt-5 p-3 ">
             <h2 class="w-50">Todo</h2>
-            <h2 class="w-25">End</h2>
+            <h2>End</h2>
+            <div></div>
         </div>
-        <div class="bg-light w-100 p-3">
+        <div class="bg-light w-100 p-2">
             <% if(locals.todos) { %>
                 <% todos.items.forEach((item) => { %>
                     <div class="item d-flex justify-content-between">
+                        <div class="w-50"><p style="height: auto; font-size: 25px;" class="me-5 text-wrap"><%= item.todo_item %></p></div>
+                        <div><p style=" font-size: 25px;" class="m-0 text-wrap"><%= item.end.slice(0,10) %> <%= item.end.slice(12,19) %></p></div>
                         <form action="/completed/<%= item.id %>" method="get" onclick="this.submit()" class="w-auto">
-                            <input type="checkbox" name="completed" id="todo-completed" onclick="onChecked()">
+                            <button class="btn btn-lg btn-danger">Remove</button>
                         </form>
-                        <div class="w-50"><p><%= item.todo_item %></p></div>
-                        <div class="w-25"><p><%= item.end.slice(0,10) %> <%= item.end.slice(12,19) %></p></div>
-                        
                     </div>
-                    <hr style="height: 1px;">
+                    <hr style="height: 1px;" class="m-1">
                 <% }) %>
             <% } %>
+            <div class="bg-light">
+                <form action="/addtodo" method="post" class="d-flex justify-content-between  bg-light gap-2">
+                        <div class="w-50">
+                            <input type="text" name="todo[]"  class="p-2 border-0 mb-1" placeholder="Enter your todo here" style=" font-size: 25px;" required>
+                        </div>
+                        <div>
+                            <input type="date" name="end[]" id="date" class="p-2 border-0 text-center" style=" font-size: 25px;" required>
+                        </div>
+                    <button class="btn btn-primary btn-lg w-0" type="submit">Add Todo</button>
+                </form>
+              </div>
         </div>
-        <form action="/addtodo" method="get" class="mt-5" onclick="this.submit()">
-            <button class="btn btn-primary">Add Todo</button>
-        </form>
     </div>
 <%- include('partials/footer.ejs') %>
