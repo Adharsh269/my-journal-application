@@ -3,56 +3,61 @@
   <div class="d-flex flex-column">
     <div class="mt-5 bg-dark p-2">
       <h1 class="text-light">
-        <%= locals.prompts ? "Prompts" : locals.goals ? "Life Goals" : "Nothing"
+        <%= locals.list ? "Prompts" : locals.goals ? "Life Goals" : "Nothing"
         %>
       </h1>
     </div>
 
     <div class="prompts">
-			<% if (locals.prompts) { %> 
-				<% prompts.prompts.forEach((prompt) => { %>
+			<% if (locals.list) { %> 
+				<% list.prompts.forEach((pt) => { %>
 				<div class="bg-light p-3">
-					<h3 style="color: #44423d" class="mt-2">
-						<% if (prompt) { %>
-						<li contentEditable="true" class="ps-4"><%= prompt %></li>
-						<% } else { %> No prompts <% } %>
+					<h3 style="color: #44423d" class="mt-2 d-flex justify-content-between">
+						<% if (pt) { %>
+              <form action="/patchprompts" method="post" class="d-flex justify-content-between gap-5"> 
+                <input type="hidden" name="prompt_id" value="<%= pt.id %>">
+                <li contentEditable="true" class="ps-4"  oninput="promptChange(this, <%= pt.id %>)"><%= pt.prompt %></li>
+                <input type="hidden" name="prompt" id="promptInput-<%= pt.id %>" value="<%= pt.prompt %>">
+                <button class="btn rounded-circle btn-warning" type="submit"><i class="fa-solid fa-pencil"></i></button>
+              </form>
+              <form action="/deleteprompts" method="post">
+                <input type="hidden" name="prompt_id" value="<%= pt.id %>">
+                <button class="btn btn-danger"><i class="fa-solid fa-trash"></i></button>
+              </form>
+						<% } else { %> 
+              No prompts 
+            <% } %>
 					</h3>
+          
 					<hr style="height: 1px" class="m-1"/>
 				</div>
 				<% }) %>
 				<div class="bg-light">
-					<!-- <form action="/newgoal" method="get">
-													<button class="btn btn-primary" role="submit">Add Goal</button>
-											</form> -->
 					<form action="/addprompt" method="post" class="d-flex justify-content-between align-items-center p-2 gap-3">
-						<input type="text" name="prompt" class="form-control border-0 w-75" placeholder="Enter your goal here" style="font-size: 25px;" required>
-						<button class="btn btn-primary btn-lg w-0" type="submit">Add Prompt</button>
+						<input type="text" name="prompt" id="prompt" class="form-control border-0 w-75" placeholder="Enter your goal here" style="font-size: 25px;" required>
+						<form action="/patchprompt" method="post">
+              <button class="btn btn-primary btn-lg w-0" type="submit">Add Prompt</button>
+            </form>
 					</form>
 				</div>
 		</div>
 
     <% } else if (locals.goals) { %>
     <div class="goals ">
-      <% locals.goals.lifegoals.forEach((lg) => { %>
-      <div class="bg-light p-2">
-        <form action="/goalcompleted/<%= lg.id %>" method="get">
-          <button
-            type="submit"
-            style="all: unset; cursor: pointer; width: 100%"
-          >
+      <% goals.lifegoals.forEach((lg) => { %>
+      <div class="bg-light p-3">
             <h3 style="color: #44423d">
               <% if (lg) { %>
-              <li
-                contentEditable="true"
-                class="ps-4"
-                style="text-decoration: <%= lg.completed ? 'line-through' : 'none' %>;"
-              >
-                <%= lg.goal %>
-              </li>
+              <form action="/pathchgoal" method="post" class="d-flex justify-content-between">
+                <input type="hidden" name="goal_id" id="goal_id" value="<%= lg.id %>">
+                <li class="ps-4"  oninput="goalChange(this,<%= lg.id %>)" contenteditable="true"><%= lg.goal %></li>
+                <input type="hidden" name="goal" id="goalInput-<%= lg.id %>" value="<%= lg.goal %>">
+                <button class="btn rounded-circle btn-warning" type="submit"><i class="fa-solid fa-pencil"></i></button>
+              </form>
               <% } else { %> No goals <% } %>
             </h3>
           </button>
-        </form>
+        
         <hr style="height: 1px" class="m-1"/>
       </div>
       <% }) %>
@@ -69,4 +74,12 @@
     <% } %>
   </div>
 </div>
+<script>
+  function promptChange(element, id) {
+    document.getElementById('promptInput-' + id).value = element.innerText;
+  }
+  function goalChange(element, id) {
+    document.getElementById('goalInput-'+id).value = element.innerText;
+  }
+</script>
 <%- include('partials/footer.ejs') %>

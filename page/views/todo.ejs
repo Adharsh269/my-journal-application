@@ -9,14 +9,22 @@
         <div class="bg-light w-100 p-2">
             <% if(locals.todos) { %>
                 <% todos.items.forEach((item) => { %>
-                    <div class="item d-flex justify-content-between">
+                    <% if(item.id == null) { %>
+                        <h2>Nothing</h2>
+                    <% } else { %>
+                        <div class="item d-flex justify-content-between">
                         <div class="w-50"><p style="height: auto; font-size: 25px;" class="me-5 text-wrap"><%= item.todo_item %></p></div>
-                        <div><p style=" font-size: 25px;" class="m-0 text-wrap"><%= item.end.slice(0,10) %> <%= item.end.slice(12,19) %></p></div>
-                        <form action="/completed/<%= item.id %>" method="get" onclick="this.submit()" class="w-auto">
-                            <button class="btn btn-lg btn-danger">Remove</button>
-                        </form>
+                        <div><p style=" font-size: 25px;" class="m-0 text-wrap"><%= item.end.slice(0,10) %></p></div>
+                        
+                            <form action="/completed/<%= item.id %>" method="get" onclick="this.submit()" class="w-auto">
+                                <button class="btn btn-lg btn-danger">Remove</button>
+                            </form>
+                        
                     </div>
                     <hr style="height: 1px;" class="m-1">
+
+                   <% } %>
+                    
                 <% }) %>
             <% } %>
             <div class="bg-light">
@@ -29,7 +37,7 @@
                         </div>
                     <button class="btn btn-primary btn-lg w-0" type="submit">Add Todo</button>
                 </form>
-              </div>
+            </div>
         </div>
     </div>
 <%- include('partials/footer.ejs') %>

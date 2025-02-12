@@ -180,13 +180,19 @@ app.get("/users/:id/prompts", async (req, res) => {
     const userid = req.params.id;
     const result = await db.query(
       `SELECT u.id, u.username, 
-      JSON_AGG(DISTINCT p.list) as prompts 
-      FROM users AS u LEFT JOIN prompts AS p ON u.id = p.user_id 
+      JSON_AGG(
+        JSON_BUILD_OBJECT(
+          'id',p.id,
+          'prompt',p.list
+        )
+      ) as prompts 
+      FROM users AS u 
+      LEFT JOIN prompts AS p ON u.id = p.user_id 
       WHERE u.id = $1 
       GROUP BY u.id, u.username;`,
       [userid]
     );
-    res.json(result.rows);
+    res.json(result.rows  );
   } catch (err) {
     res.json(err);
   }
@@ -443,9 +449,9 @@ app.post("/users/:id/prompts", async (req, res) => {
 app.delete("/users/:id/prompts/:prompt_id", async (req, res) => {
   try {
     const userid = req.params.id;
-    const promptid = req.params.prompt_id;
+    const prompt_id = req.params.prompt_id;
     const result = await db.query(`DELETE FROM prompts
-      WHERE prompts.id = $1 AND prompts.user_id = $2`, [promptid, userid]);
+      WHERE prompts.id = $1 AND prompts.user_id = $2`, [prompt_id, userid]);
 
       if(result.rowCount === 0) {
         return res.status(404).json({message:"Prompt not found or it does not belongto the user."})
@@ -568,6 +574,22 @@ app.patch("/users/:id/goals/:goals_id", async (req, res) => {
       return res.status(404).json({message:"life goal is not updated."});
     }
     res.status(200).json({message:"Successfully updated the goal."});
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+app.patch("/users/:id/prompt/:prompt_id", async (req, res) => {
+  try {
+    const { id , prompt_id} = req.params;
+    const prompt = req.body.prompt;
+    console.log(prompt, id, prompt_id)
+    const result = await db.query(`UPDATE prompts SET list = $1 WHERE prompts.id = $2 AND prompts.user_id = $3`, [prompt, prompt_id, id]);
+
+    if(result.rowCount === 0) {
+      return res.status(404).json({message:"prompt is not updated."});
+    }
+    res.status(200).json({message:"Successfully updated the prompt."});
   } catch (err) {
     console.log(err);
     res.status(500).json(err);

@@ -214,8 +214,8 @@ app.get("/prompts", async (req, res) => {
 		try {
 			const result = await axios.get(`http://localhost:3000/users/${userid}/prompts`);
 			const prompts = result.data[0];
-			console.log(prompts);
-			res.render("promptsGoals.ejs",{prompts: prompts});
+			// console.log(prompts);
+			res.render("promptsGoals.ejs",{list: prompts});
 		} catch (error) {
 			console.log(error);
 			res.status(500).json(error);
@@ -230,7 +230,6 @@ app.get("/lifegoals", async (req, res) => {
 	if(req.isAuthenticated()) {
 		const userid = req.user.id;
 		try {
-			console.log(userid);
 			const result = await axios.get(`http://localhost:3000/users/${userid}/goals`);
 			const goals = result.data[0];
 			// console.log(goals);
@@ -250,7 +249,7 @@ app.get("/todo", async (req, res) => {
 		const userid = req.user.id;
 		const result = await axios.get(`http://localhost:3000/users/${userid}/todo`);
 		const todos = result.data[0];
-		// console.log(todos);
+		console.log(todos);
 		res.render("todo.ejs",{todos: todos})
 	} else {
 		res.redirect("/login");
@@ -438,6 +437,65 @@ app.post("/addepisode", async (req, res) => {
 		res.redirect("/login");
 	}
 });
+
+app.post("/patchprompts", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const userid = req.user.id;
+		const {prompt, prompt_id} = req.body;
+		console.log(req.body);
+		try {
+
+		await axios.patch(`http://localhost:3000/users/${userid}/prompt/${prompt_id}`,{
+			prompt:prompt
+		});
+		res.redirect("/prompts");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	} else {
+		res.redirect("/login");
+	}
+});
+
+app.post("/pathchgoal", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const userid = req.user.id;
+		const {goal,goal_id} = req.body;
+		// console.log(goal);
+		// console.log(goal_id);
+		// console.log(userid);
+		try {
+			await axios.patch(`http://localhost:3000/users/${userid}/goals/${goal_id}`, {
+				goal:goal
+			});
+			res.redirect("/lifegoals");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+		
+	} else {
+		res.redirect("/login");
+	}
+})
+
+app.post("/deleteprompts", async (req, res) => {
+	if(req.isAuthenticated()) {
+		const userid = req.user.id;
+		const {prompt_id} = req.body;
+		try {
+			await axios.delete(`http://localhost:3000/users/${userid}/prompts/${prompt_id}`);
+			res.redirect("/prompts");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+		
+	} else {
+		res.redirect("/login");
+	}
+})
 
 passport.serializeUser((user, cb) => {
 	cb(null, user);
